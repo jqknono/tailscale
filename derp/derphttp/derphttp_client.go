@@ -24,6 +24,7 @@ import (
 	"net/netip"
 	"net/url"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -280,7 +281,7 @@ func (c *Client) urlString(node *tailcfg.DERPNode) string {
 	if debugUseDERPHTTP() {
 		proto = "http"
 	}
-	return fmt.Sprintf("%s://%s/derp", proto, node.HostName)
+	return fmt.Sprintf("%s://%s:%d/derp", proto, node.HostName, node.DERPPort)
 }
 
 // AddressFamilySelector decides whether IPv6 is preferred for
@@ -837,7 +838,7 @@ func (c *Client) dialNodeUsingProxy(ctx context.Context, n *tailcfg.DERPNode, pr
 		}
 	}()
 
-	target := net.JoinHostPort(n.HostName, "443")
+	target := net.JoinHostPort(n.HostName, strconv.Itoa(n.DERPPort))
 
 	var authHeader string
 	if v, err := tshttpproxy.GetAuthHeader(pu); err != nil {
